@@ -12,7 +12,7 @@ class ArchiveController extends EGController
     {
 		Stat::setView('blog', 'archive', 'index');
 
-		$this->layout = '//creative-item';
+		//$this->layout = '//creative-item';
         return $this->render('index');
     }
 }

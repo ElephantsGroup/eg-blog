@@ -104,7 +104,7 @@ class DefaultController extends EGController
     {
 		Stat::setView('blog', 'default', 'index');
 		
-		$this->layout = '//creative-item';
+		//$this->layout = '//creative-item';
 		Yii::$app->controller->addLanguageUrl('fa-IR', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'fa-IR']), (Yii::$app->controller->language !== 'fa-IR'));
 		Yii::$app->controller->addLanguageUrl('en', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'en']), (Yii::$app->controller->language !== 'en'));
         
@@ -141,7 +141,7 @@ class DefaultController extends EGController
     {
 		Stat::setView('blog', 'default', 'view');
 
-        $this->layout = '//creative-item';
+        //$this->layout = '//creative-item';
 		Yii::$app->controller->addLanguageUrl('fa-IR', Yii::$app->urlManager->createUrl(['blog/default/view', 'id'=>$id, 'lang' => 'fa-IR']), (Yii::$app->controller->language !== 'fa-IR'));
 		Yii::$app->controller->addLanguageUrl('en', Yii::$app->urlManager->createUrl(['blog/default/view', 'id'=>$id, 'lang' => 'en']), (Yii::$app->controller->language !== 'en'));
 		$model = Blog::findOne($id);

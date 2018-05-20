@@ -107,8 +107,8 @@ class Blog extends \yii\db\ActiveRecord
      */
     public function getTitle()
     {
-        $module = \Yii::$app->getModule('news');
-        $value = $module::t('news', 'Undefined');
+        $module = \Yii::$app->getModule('blog');
+        $value = $module::t('blog', 'Undefined');
         $translate = BlogTranslation::findOne(['blog_id'=>$this->id, 'language'=>Yii::$app->language]);
         if($translate)
             $value = $translate->title;
