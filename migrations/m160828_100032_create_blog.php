@@ -44,178 +44,78 @@ class m160828_100032_create_blog extends Migration
         $this->addForeignKey('fk_eg_blog_translation', '{{%eg_blog_translation}}', 'blog_id', '{{%eg_blog}}', 'id', 'RESTRICT', 'CASCADE');
 
         $this->insert('{{%eg_blog_category}}', [
+			'id' => 1,
             'name' => 'عمومی',
+			'status' => 1,
         ]);
         $this->insert('{{%eg_blog_category_translation}}', [
             'cat_id' => 1,
             'language' => 'fa-IR',
             'title' => 'عمومی',
         ]);
+        $this->insert('{{%eg_blog_category_translation}}', [
+            'cat_id' => 1,
+            'language' => 'en-US',
+            'title' => 'public',
+        ]);
         $this->insert('{{%eg_blog}}', [
+			'id' => 1,
             'category_id' => 1,
             'thumb' => 'blog-1.png',
-            'archive_time' => 1467629406,
-            'creation_time' => 1467629406,
-            'update_time' => 1467629406,
+            'archive_time' => date('Y-m-d H:i:s',time() + 108000),
+            'creation_time' => date('Y-m-d H:i:s',time()),
+            'update_time' => date('Y-m-d H:i:s',time()),
             'author_id' => 1,
             'status' => 1,
         ]);
         $this->insert('{{%eg_blog}}', [
+			'id' => 2,
             'category_id' => 1,
             'thumb' => 'blog-2.png',
-            'archive_time' => 1467629406,
-            'creation_time' => 1467629406,
-            'update_time' => 1467629406,
+            'archive_time' => date('Y-m-d H:i:s',time() + 108000),
+            'creation_time' => date('Y-m-d H:i:s',time()),
+            'update_time' => date('Y-m-d H:i:s',time()),
             'author_id' => 1,
             'status' => 1,
         ]);
         $this->insert('{{%eg_blog}}', [
+			'id' => 3,
             'category_id' => 1,
             'thumb' => 'blog-3.png',
-            'archive_time' => 1467629406,
-            'creation_time' => 1467629406,
-            'update_time' => 1467629406,
+            'archive_time' => date('Y-m-d H:i:s',time() + 108000),
+            'creation_time' => date('Y-m-d H:i:s',time()),
+            'update_time' => date('Y-m-d H:i:s',time()),
             'author_id' => 1,
             'status' => 1,
         ]);
         $this->insert('{{%eg_blog_translation}}', [
             'blog_id' => 1,
             'language' => 'fa-IR',
-            'title' => 'مزایای استفاده از پلت فرم ما',
-            'subtitle' => 'مزایا و نقاط قوت پلت فرم کلید',
-            'intro' => 'استفاده از این پلت فرم داری فواید بسیاری است',
-            'description' => '<p>این پلت فرم دارای نقاط قوت بسیاری است که عبارتند از :</p><p>نصب و راه اندازی ساده&nbsp;</p><p>انجام تنظیمات به صورت خودکار</p><p>دارای ماژولهای متعدد است</p><p>و ...</p>',
+            'title' => 'ساخت اولین نسخه eg-cms',
+            'subtitle' => 'اولین نسخه eg-cms با داشتن پلاگین های متعدد ساخته و در گیت هاب عرضه شد.',
+            'intro' => 'اولین نسخه eg-cms با داشتن پلاگین های متعدد ساخته و در گیت هاب عرضه شد. پلاگین هایی مانند تاریخ و تقویم فارسی تچندزبانی, اخبار، بلاگ و ... به رایگان در دسترس هستند',
+            'description' => '<p>سورس کد برنامه در <a href="https://github.com/ElephantsGroup/eg-cms">گیت هاب</a> موجود است. این بسته بر پایه ی Yii2 ساخته شده است. اطلاعات بیشتر را می توانید در <a href="http://elephantsgroup.com">وب سایت ما</a> بیابید.</p>',
         ]);
         $this->insert('{{%eg_blog_translation}}', [
             'blog_id' => 2,
             'language' => 'fa-IR',
-            'title' => 'مزایای استفاده از پلت فرم ما',
-            'subtitle' => 'مزایا و نقاط قوت پلت فرم کلید',
-            'intro' => 'استفاده از این پلت فرم داری فواید بسیاری است',
-            'description' => '<p>این پلت فرم دارای نقاط قوت بسیاری است که عبارتند از :</p><p>نصب و راه اندازی ساده&nbsp;</p><p>انجام تنظیمات به صورت خودکار</p><p>دارای ماژولهای متعدد است</p><p>و ...</p>',
+            'title' => 'ساخت اولین نسخه eg-cms',
+            'subtitle' => 'اولین نسخه eg-cms با داشتن پلاگین های متعدد ساخته و در گیت هاب عرضه شد.',
+            'intro' => 'اولین نسخه eg-cms با داشتن پلاگین های متعدد ساخته و در گیت هاب عرضه شد. پلاگین هایی مانند تاریخ و تقویم فارسی تچندزبانی, اخبار، بلاگ و ... به رایگان در دسترس هستند',
+            'description' => '<p>سورس کد برنامه در <a href="https://github.com/ElephantsGroup/eg-cms">گیت هاب</a> موجود است. این بسته بر پایه ی Yii2 ساخته شده است. اطلاعات بیشتر را می توانید در <a href="http://elephantsgroup.com">وب سایت ما</a> بیابید.</p>',
         ]);
         $this->insert('{{%eg_blog_translation}}', [
             'blog_id' => 3,
             'language' => 'fa-IR',
-            'title' => 'مزایای استفاده از پلت فرم ما',
-            'subtitle' => 'مزایا و نقاط قوت پلت فرم کلید',
-            'intro' => 'استفاده از این پلت فرم داری فواید بسیاری است',
-            'description' => '<p>این پلت فرم دارای نقاط قوت بسیاری است که عبارتند از :</p><p>نصب و راه اندازی ساده&nbsp;</p><p>انجام تنظیمات به صورت خودکار</p><p>دارای ماژولهای متعدد است</p><p>و ...</p>',
-        ]);
-
-        $this->insert('{{%auth_item}}', [
-            'name' => '/blog/admin/*',
-            'type' => 2,
-            'created_at' => 1467629406,
-            'updated_at' => 1467629406
-        ]);
-        $this->insert('{{%auth_item}}', [
-            'name' => '/blog/category-admin/*',
-            'type' => 2,
-            'created_at' => 1467629406,
-            'updated_at' => 1467629406
-        ]);
-        $this->insert('{{%auth_item}}', [
-            'name' => '/blog/translation/*',
-            'type' => 2,
-            'created_at' => 1467629406,
-            'updated_at' => 1467629406
-        ]);
-        $this->insert('{{%auth_item}}', [
-            'name' => '/blog/category-translation/*',
-            'type' => 2,
-            'created_at' => 1467629406,
-            'updated_at' => 1467629406
-        ]);
-        $this->insert('{{%auth_item}}', [
-            'name' => 'blog_management',
-            'type' => 2,
-            'created_at' => 1467629406,
-            'updated_at' => 1467629406
-        ]);
-        $this->insert('{{%auth_item_child}}', [
-            'parent' => 'blog_management',
-            'child' => '/blog/admin/*',
-        ]);
-        $this->insert('{{%auth_item_child}}', [
-            'parent' => 'blog_management',
-            'child' => '/blog/category-admin/*',
-        ]);
-        $this->insert('{{%auth_item_child}}', [
-            'parent' => 'blog_management',
-            'child' => '/blog/category-translation/*',
-        ]);
-        $this->insert('{{%auth_item_child}}', [
-            'parent' => 'blog_management',
-            'child' => '/blog/translation/*',
-        ]);
-        $this->insert('{{%auth_item}}', [
-            'name' => 'blog_manager',
-            'type' => 1,
-            'created_at' => 1467629406,
-            'updated_at' => 1467629406
-        ]);
-        $this->insert('{{%auth_item_child}}', [
-            'parent' => 'blog_manager',
-            'child' => 'blog_management',
-        ]);
-        $this->insert('{{%auth_item_child}}', [
-            'parent' => 'super_admin',
-            'child' => 'blog_manager',
+            'title' => 'ساخت اولین نسخه eg-cms',
+            'subtitle' => 'اولین نسخه eg-cms با داشتن پلاگین های متعدد ساخته و در گیت هاب عرضه شد.',
+            'intro' => 'اولین نسخه eg-cms با داشتن پلاگین های متعدد ساخته و در گیت هاب عرضه شد. پلاگین هایی مانند تاریخ و تقویم فارسی تچندزبانی, اخبار، بلاگ و ... به رایگان در دسترس هستند',
+            'description' => '<p>سورس کد برنامه در <a href="https://github.com/ElephantsGroup/eg-cms">گیت هاب</a> موجود است. این بسته بر پایه ی Yii2 ساخته شده است. اطلاعات بیشتر را می توانید در <a href="http://elephantsgroup.com">وب سایت ما</a> بیابید.</p>',
         ]);
     }
 
     public function safeDown()
     {
-        $this->delete('{{%auth_item_child}}', [
-            'parent' => 'super_admin',
-            'child' => 'blog_manager',
-        ]);
-        $this->delete('{{%auth_item_child}}', [
-            'parent' => 'blog_manager',
-            'child' => 'blog_management',
-        ]);
-        $this->delete('{{%auth_item}}', [
-            'name' => 'blog_manager',
-            'type' => 1,
-        ]);
-        $this->delete('{{%auth_item_child}}', [
-            'parent' => 'blog_management',
-            'child' => '/blog/translation/*',
-        ]);
-        $this->delete('{{%auth_item_child}}', [
-            'parent' => 'blog_management',
-            'child' => '/blog/category-translation/*',
-        ]);
-        $this->delete('{{%auth_item_child}}', [
-            'parent' => 'blog_management',
-            'child' => '/blog/category-admin/*',
-        ]);
-        $this->delete('{{%auth_item_child}}', [
-            'parent' => 'blog_management',
-            'child' => '/blog/admin/*',
-        ]);
-        $this->delete('{{%auth_item}}', [
-            'name' => 'blog_management',
-            'type' => 2,
-        ]);
-        $this->delete('{{%auth_item}}', [
-            'name' => '/blog/category-translation/*',
-            'type' => 2,
-        ]);
-        $this->delete('{{%auth_item}}', [
-            'name' => '/blog/translation/*',
-            'type' => 2,
-        ]);
-        $this->delete('{{%auth_item}}', [
-            'name' => '/blog/category-admin/*',
-            'type' => 2,
-        ]);
-        $this->delete('{{%auth_item}}', [
-            'name' => '/blog/admin/*',
-            'type' => 2,
-        ]);
-
         $this->dropForeignKey('fk_eg_blog_translation', '{{%eg_blog_translation}}');
         $this->dropTable('{{%eg_blog_translation}}');
         $this->dropForeignKey('fk_eg_blog_category', '{{%eg_blog}}');
