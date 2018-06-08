@@ -31,6 +31,20 @@ class m180608_155948_add_blog_management extends Migration
 					'created_at'	=> time(),
 					'updated_at'	=> time()
 				]);
+			if (!$query->from('{{%auth_item}}')->where(['name' => '/blog/translation/*'])->exists())
+				$this->insert('{{%auth_item}}', [
+					'name'			=> '/blog/translation/*',
+					'type'			=> 2,
+					'created_at'	=> time(),
+					'updated_at'	=> time()
+				]);
+			if (!$query->from('{{%auth_item}}')->where(['name' => '/blog/category-translation/*'])->exists())
+				$this->insert('{{%auth_item}}', [
+					'name'			=> '/blog/category-translation/*',
+					'type'			=> 2,
+					'created_at'	=> time(),
+					'updated_at'	=> time()
+				]);
 			if (!$query->from('{{%auth_item}}')->where(['name' => 'blog_management'])->exists())
 				$this->insert('{{%auth_item}}', [
 					'name'			=> 'blog_management',
@@ -64,6 +78,16 @@ class m180608_155948_add_blog_management extends Migration
 				$this->insert('{{%auth_item_child}}', [
 					'parent'	=> 'blog_management',
 					'child'		=> '/blog/category-admin/*'
+				]);
+			if (!$query->from('{{%auth_item_child}}')->where(['parent' => 'blog_management', 'child' => '/blog/translation/*'])->exists())
+				$this->insert('{{%auth_item_child}}', [
+					'parent'	=> 'blog_management',
+					'child'		=> '/blog/translation/*'
+				]);
+			if (!$query->from('{{%auth_item_child}}')->where(['parent' => 'blog_management', 'child' => '/blog/category-translation/*'])->exists())
+				$this->insert('{{%auth_item_child}}', [
+					'parent'	=> 'blog_management',
+					'child'		=> '/blog/category-translation/*'
 				]);
 			if (!$query->from('{{%auth_item_child}}')->where(['parent' => 'blog_manager', 'child' => 'blog_management'])->exists())
 				$this->insert('{{%auth_item_child}}', [
