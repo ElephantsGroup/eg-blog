@@ -3,11 +3,13 @@
 namespace elephantsGroup\blog\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "{{%eg_blog}}".
  *
  * @property integer $id
+ * @property integer $version
  * @property integer $category_id
  * @property string $update_time
  * @property string $creation_time
@@ -30,6 +32,7 @@ class Blog extends \yii\db\ActiveRecord
     public static $_STATUS_CONFIRMED = 1;
     public static $_STATUS_REJECTED = 2;
     public static $_STATUS_ARCHIVED = 3;
+    public static $_STATUS_EDITED = 4;
 
     public static $upload_url;
     public static $upload_path;
@@ -50,6 +53,7 @@ class Blog extends \yii\db\ActiveRecord
             self::$_STATUS_CONFIRMED => $module::t('Confirmed'),
             self::$_STATUS_REJECTED => $module::t('Rejected'),
             self::$_STATUS_ARCHIVED => $module::t('Archived'),
+            self::$_STATUS_EDITED => $module::t('Edited'),
         ];
     }
 
@@ -67,9 +71,10 @@ class Blog extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['category_id', 'views', 'author_id', 'status'], 'integer'],
+            [['version', 'category_id', 'views', 'author_id', 'status'], 'integer'],
             [['update_time', 'creation_time', 'archive_time'], 'date', 'format'=>'php:Y-m-d H:i:s'],
             [['thumb'], 'trim'],
+            [['id', 'version', 'category_id'], 'required'],
             [['thumb'], 'string', 'max' => 15],
             [['update_time'], 'default', 'value' => (new \DateTime)->setTimestamp(time())->setTimezone(new \DateTimeZone('Iran'))->format('Y-m-d H:i:s')],
             [['creation_time'], 'default', 'value' => (new \DateTime)->setTimestamp(time())->setTimezone(new \DateTimeZone('Iran'))->format('Y-m-d H:i:s')],
@@ -91,6 +96,7 @@ class Blog extends \yii\db\ActiveRecord
         $module = \Yii::$app->getModule('base');
         return [
             'id' => $module::t('ID'),
+            'version' => $module::t('Version'),
             'category_id' => $module::t('Category ID'),
             'update_time' => $module::t('Update Time'),
             'creation_time' => $module::t('Creation Time'),
@@ -106,14 +112,15 @@ class Blog extends \yii\db\ActiveRecord
      * @return \yii\db\ActiveQuery
      */
     public function getTitle()
-    {
-        $module = \Yii::$app->getModule('blog');
-        $value = $module::t('blog', 'Undefined');
-        $translate = BlogTranslation::findOne(['blog_id'=>$this->id, 'language'=>Yii::$app->language]);
-        if($translate)
-            $value = $translate->title;
-        return $value;
-    }
+  	{
+  		$module = \Yii::$app->getModule('blog');
+  		$value = $module::t('blog', 'Undefined');
+  		$max_version_translation = BlogTranslation::find()->where(['blog_id' => $this->id, 'language'=>Yii::$app->language])->max('version');
+  		$translate = BlogTranslation::findOne(['blog_id'=>$this->id, 'language'=>Yii::$app->language, 'version' => $max_version_translation]);
+  		if($translate)
+  			$value = $translate->title;
+  		return $value;
+  	}
 
     /**
      * @return \yii\db\ActiveQuery
@@ -128,12 +135,17 @@ class Blog extends \yii\db\ActiveRecord
      */
     public function getTranslations()
     {
-        return $this->hasMany(BlogTranslation::className(), ['blog_id' => 'id']);
+        return $this->hasMany(BlogTranslation::className(), ['blog_id' => 'id', 'version' => 'version']);
     }
 
     public function getTranslationByLang()
     {
-        return $this->hasOne(BlogTranslation::className(), ['blog_id' => 'id'])->where('language = :language', [':language' => Yii::$app->controller->language]);
+        return $this->hasOne(BlogTranslation::className(), ['blog_id' => 'id', 'version' => 'version' ])->where('language = :language', [':language' => Yii::$app->controller->language]);
+    }
+
+    public static function find()
+    {
+      return new BlogQuery(get_called_class());
     }
 
     public function beforeSave($insert)
@@ -175,4 +187,54 @@ class Blog extends \yii\db\ActiveRecord
         return parent::beforeDelete();
     }
 
+    public function getCanBeConfirmed()
+    {
+      return (($this->status == self::$_STATUS_SUBMITTED || $this->status == self::$_STATUS_ARCHIVED || $this->status == self::$_STATUS_REJECTED)
+        && Yii::$app->user &&(Yii::$app->user->identity->isAdmin || Yii::$app->user->id == $this->author_id)
+      );
+    }
+
+    public function Confirm()
+    {
+      if($this->getCanBeConfirmed())
+      {
+        $this->updateAttributes(['status' => self::$_STATUS_CONFIRMED]);
+        return true;
+      }
+      return false;
+    }
+
+    public function getCanBeRejected()
+    {
+      return (($this->status == self::$_STATUS_SUBMITTED || $this->status == self::$_STATUS_CONFIRMED || $this->status == self::$_STATUS_ARCHIVED)
+        && Yii::$app->user &&(Yii::$app->user->identity->isAdmin || Yii::$app->user->id == $this->author_id)
+      );
+    }
+
+    public function Reject()
+    {
+      if($this->getCanBeRejected())
+      {
+        $this->updateAttributes(['status' => self::$_STATUS_REJECTED]);
+        return true;
+      }
+      return false;
+    }
+
+    public function getCanBeArchived()
+    {
+      return (($this->status == self::$_STATUS_SUBMITTED || $this->status == self::$_STATUS_CONFIRMED || $this->status == self::$_STATUS_REJECTED)
+        && Yii::$app->user &&(Yii::$app->user->identity->isAdmin || Yii::$app->user->id == $this->author_id)
+      );
+    }
+
+    public function Archive()
+    {
+      if($this->getCanBeArchived())
+      {
+        $this->updateAttributes(['status' => self::$_STATUS_ARCHIVED]);
+        return true;
+      }
+      return false;
+    }
 }

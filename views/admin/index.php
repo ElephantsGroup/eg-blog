@@ -14,20 +14,20 @@ use yii\helpers\ArrayHelper;
 /* @var $this yii\web\View */
 /* @var $searchModel elephantsGroup\blog\models\BlogSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
-$this->title = Yii::t('blog', 'Blog List') . ' - ' . Yii::t('config', 'Company Name') . ' - ' . Yii::t('config', 'description');
-$this->params['breadcrumbs'][] = Yii::t('blog', 'Blog List');
+$module = \Yii::$app->getModule('blog');
+$this->title = Yii::t('blog', 'Blog List') . ' - ' . $module::t('config', 'Company Name') . ' - ' . $module::t('config', 'description');
+$this->params['breadcrumbs'][] = $module::t('blog', 'Blog List');
 ?>
 <div class="blog-index">
 
-    <h1><?= Yii::t('blog', 'Blog List') ?></h1>
+    <h1><?= $module::t('blog', 'Blog List') ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a(Yii::t('blog', 'Create Blog'), ['create', 'lang' => Yii::$app->controller->language], ['class' => 'btn btn-success']) ?>
+        <?= Html::a($module::t('blog', 'Create Blog'), ['create', 'lang' => Yii::$app->controller->language], ['class' => 'btn btn-success']) ?>
     </p>
     <?php
-
+    $module = \Yii::$app->getModule('blog');
     $module_base = \Yii::$app->getModule('base');
     $columns_d = [];
     $language = array_keys($module_base->languages);
@@ -37,12 +37,12 @@ $this->params['breadcrumbs'][] = Yii::t('blog', 'Blog List');
         $columns_d [] = [
             'format' => 'raw',
             'label' => $module_base::t($item, 'coding'),
-            'value' => function ($model) use($item) {
+            'value' => function ($model) use($module, $module_base, $item) {
                 return (
                 BlogTranslation::findOne(['blog_id' => $model->id, 'language'=> $item])
-                    ? Html::a(Yii::t('blog', 'Edit'), ['/blog/translation/update', 'blog_id'=>$model->id, 'language' => $item , 'lang'=>Yii::$app->controller->language]) .
-                    ' / ' . Html::a(Yii::t('blog', 'Delete'), ['/blog/translation/delete', 'blog_id'=>$model->id, 'language' => $item, 'lang'=>Yii::$app->controller->language])
-                    : Html::a(Yii::t('blog', 'Create'), ['/blog/translation/create', 'blog_id'=>$model->id, 'language'=> $item, 'lang'=>Yii::$app->controller->language])
+                    ? Html::a(Yii::t('blog', 'Edit'), ['/blog/translation/update', 'blog_id'=>$model->id, 'language' => $item , 'lang'=>Yii::$app->controller->language, 'redirectUrl'=> Yii::$app->request->url]) .
+                    ' / ' . Html::a(Yii::t('blog', 'Delete'), ['/blog/translation/delete', 'blog_id'=>$model->id, 'language' => $item, 'lang'=>Yii::$app->controller->language, 'redirectUrl'=> Yii::$app->request->url])
+                    : Html::a(Yii::t('blog', 'Create'), ['/blog/translation/create', 'blog_id'=>$model->id, 'language'=> $item, 'lang'=>Yii::$app->controller->language, 'redirectUrl'=> Yii::$app->request->url])
                 );
             },
         ];
@@ -94,12 +94,62 @@ $this->params['breadcrumbs'][] = Yii::t('blog', 'Blog List');
                 'value' => function ($model) { return Blog::getStatus()[$model->status]; },
             ],
             [
+              'format' => 'raw',
+              'label' => Yii::t('blog', 'Change Status'),
+              'value' => function ($model) use($module)  {
+                  if ( $model->status == Blog::$_STATUS_SUBMITTED)
+                  {
+                    return (Html::a($module::t('blog', 'Confirm'), ['/blog/admin/confirm', 'id'=>$model->id, 'redirectUrl'=> Yii::$app->request->url]) .
+                    '/' . Html::a($module::t('blog', 'Reject'), ['/blog/admin/reject', 'id'=>$model->id, 'redirectUrl'=> Yii::$app->request->url]));
+                  }
+                  elseif ($model->status == Blog::$_STATUS_CONFIRMED)
+                  {
+                    return(Html::a($module::t('blog', 'Reject'), ['/blog/admin/reject', 'id'=>$model->id, 'redirectUrl'=> Yii::$app->request->url]) .
+                    '/' . Html::a($module::t('blog', 'Archive'), ['/blog/admin/archive', 'id'=>$model->id, 'redirectUrl'=> Yii::$app->request->url]));
+                  }
+                  elseif ($model->status == Blog::$_STATUS_REJECTED)
+                  {
+                    return (Html::a($module::t('blog', 'Confirm'), ['/blog/admin/confirm', 'id'=>$model->id, 'redirectUrl'=> Yii::$app->request->url]) .
+                    '/' . Html::a($module::t('blog', 'Archive'), ['/blog/admin/archive', 'id'=>$model->id, 'redirectUrl'=> Yii::$app->request->url]));
+                  }
+                  else
+                  {
+                    return (Html::a($module::t('blog', 'Confirm'), ['/blog/admin/confirm', 'id'=>$model->id, 'redirectUrl'=> Yii::$app->request->url]) .
+                    '/' . Html::a($module::t('blog', 'Reject'), ['/blog/admin/reject', 'id'=>$model->id, 'redirectUrl'=> Yii::$app->request->url]));
+                  }
+              },
+            ],
+            [
                 'class' => 'yii\grid\ActionColumn',
-
-            ]
+                'buttons' => [
+          				'view' => function ($url, $model)
+          				{
+          					$label = '<span class="glyphicon glyphicon-eye-open"></span>';
+          					$url = ['/blog/admin/view', 'id'=>$model->id, 'lang'=>Yii::$app->controller->language];
+          					return Html::a($label, $url);
+          				},
+          				'update' => function ($url, $model)
+          				{
+          					$label = '<span class="glyphicon glyphicon-pencil"></span>';
+          					$url = ['/blog/admin/update', 'id'=>$model->id, 'lang'=>Yii::$app->controller->language];
+          					return Html::a($label, $url);
+          				},
+          				'delete' => function ($url, $model)
+          				{
+          					$label = '<span class="glyphicon glyphicon-trash"></span>';
+          					$url = ['/blog/admin/delete', 'id'=>$model->id, 'lang'=>Yii::$app->controller->language, 'redirectUrl'=> Yii::$app->request->url];
+          					$options = [
+          						'title' => Yii::t('yii', 'Delete'),
+                      'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+          						'data-method' => 'post'
+          					];
+          					return Html::a($label, $url, $options);
+          				},
+          			],
+            ],
         ];
 
-    array_splice($columns,7,0,$columns_d);
+    array_splice($columns, 7,0 ,$columns_d);
 
 //    $action_columns = [
 //        'class' => 'yii\grid\ActionColumn',

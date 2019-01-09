@@ -17,7 +17,7 @@ class DateList extends Widget
 	public $title;
 	public $view_file = 'date_list';
 	protected $_list = [];
-	
+
 	public function init()
 	{
 		if(!isset($this->language) || !$this->language)
@@ -27,7 +27,7 @@ class DateList extends Widget
         if(!isset($this->view_file) || !$this->view_file)
             $this->view_file = Yii::t('blog_params', 'View File');
 	}
-	
+
 
     public function run()
 	{
@@ -53,15 +53,15 @@ class DateList extends Widget
 					$date = new \DateTime();
 					$date->setTimestamp($begin_time);
 					$begin_time = $date->format('Y-m-d');
-					
+
 					$end_time = Jdf::jmktime(23, 59, 59, intVal($max_date_month),30, intVal($max_date_year), 'Iran');
 					$end_date = Jdf::jdate('Y/m/d', $end_time, '', 'Iran', 'en');
 					$date = new \DateTime();
 					$date->setTimestamp($end_time);
 					$end_time = $date->format('Y-m-d');
-					
+
 					$blog_count = Blog::find()->where(['between', 'creation_time', $begin_time, $end_time])->count();
-					
+
 					if($blog_count)
 					{
 						$this->_list[] = [
@@ -84,16 +84,16 @@ class DateList extends Widget
 				}
 			}
 		}
-		else 
+		else
 		{
-			$blog_date = Blog::find()->select([$expression_count, $expression_year, $expression_month])->groupBy(['year','month'])->asArray()->all();
+			$blog_date = Blog::find()->select([$expression_count, $expression_year, $expression_month])->groupBy(['year','month'])->notEdited()->asArray()->all();
 			foreach ($blog_date as $date)
 			{
 				$begin_date = new \DateTime();
 				$begin_time = mktime(0, 0, 0, $date['month'], 1, $date['year']);
 				$begin_date->setTimestamp($begin_time);
 				$from = $begin_date->format('Y-m-d');
-				
+
 				$end_date = new \DateTime();
 				$end_time = mktime(23, 59, 59, $date['month'], 30, $date['year']);
 				$end_date->setTimestamp($end_time);

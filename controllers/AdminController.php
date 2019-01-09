@@ -20,12 +20,12 @@ class AdminController extends EGController
     public function behaviors()
     {
         $behaviors = [];
-        $behaviors['verbs'] = [
-            'class' => VerbFilter::className(),
-            'actions' => [
-                'delete' => ['post'],
-            ],
-        ];
+        // $behaviors['verbs'] = [
+        //     'class' => VerbFilter::className(),
+        //     'actions' => [
+        //         'delete' => ['post'],
+        //     ],
+        // ];
         return $behaviors;
     }
 
@@ -52,7 +52,7 @@ class AdminController extends EGController
     public function actionView($id, $lang = 'fa-IR')
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModelMaxVersion($id),
         ]);
     }
 
@@ -86,18 +86,31 @@ class AdminController extends EGController
                 $hour += 12;
             $date = new \DateTime();
             $date->setTimestamp(Jdf::jmktime($hour, $minute, $second, $month, $day, $year));
-            $model->archive_time = $date->format('Y-m-d H:i:s');
-            $model->author_id = (int) Yii::$app->user->id;
-            $model->thumb_file = UploadedFile::getInstance($model, 'thumb_file');
+
+            $max_ID = Blog::find()->max('id');
+            if($max_ID == null && empty($max_ID))
+              $model->id = 1;
+            else
+              $model->id = $max_ID+1;
+      			$model->version = 1;
+      			$model->archive_time = $date->format('Y-m-d H:i:s');
+      			$model->author_id = (int) Yii::$app->user->id;
+      			$model->thumb_file = UploadedFile::getInstance($model, 'thumb_file');
 
             if($model->save())
             {
                 if ($translation->load(Yii::$app->request->post()))
                 {
-                    $translation->blog_id = $model->id;
-                    $translation->language = $this->language;
-                    if($translation->save())
-                        return $this->redirect(['view', 'id' => $model->id]);
+                  $translation->blog_id = $model->id;
+                  $translation->version = $model->version;
+                  $translation->language = $this->language;
+                  $translation->title = trim($translation->title);
+                  $translation->subtitle = trim($translation->subtitle);
+                  $translation->intro = trim($translation->intro);
+                  $translation->description = trim($translation->description);
+
+                  if($translation->save())
+                    return $this->redirect(['view', 'id' => $model->id]);
                 }
             }
         }
@@ -122,59 +135,90 @@ class AdminController extends EGController
         $_SESSION['KCFINDER']['uploadURL'] = Blog::$upload_url .'images/';
         $_SESSION['KCFINDER']['uploadDir'] = Blog::$upload_path . 'images/';
 
-        $model = $this->findModel($id);
-        $translation = BlogTranslation::findOne(array('blog_id' => $id, 'language' => $this->language));
+        $max_version = Blog::find()->where(['id' => $id])->max('version');
+    		$blog_previous_version = Blog::findOne(array('id' => $id, 'version' => $max_version));
 
-        date_default_timezone_set('Iran');
+        $model = new Blog();
+        $max_version_translation = BlogTranslation::find()->where(['blog_id' => $id, 'language' => $this->language])->max('version');
+    		$translation_previous_version = BlogTranslation::findOne(array('blog_id' => $id, 'language' => $this->language, 'version' => $max_version_translation));
+    		$translation = new BlogTranslation();
 
-        $timestamp = (new \DateTime($model->archive_time))->getTimestamp();
-        $hour = Jdf::jdate('h', $timestamp, '', 'Iran', 'en');
-        $minute = Jdf::jdate('i', $timestamp, '', 'Iran', 'en');
-        $second = Jdf::jdate('s', $timestamp, '', 'Iran', 'en');
-        $type = 'AM';
-        $model->archive_time_time = $hour . ':' . $minute . ':' . $second . ' ' . $type;
-        $model->archive_time = Jdf::jdate('Y/m/d', $timestamp, '', 'Iran', 'en');
+        if ($model->load(Yii::$app->request->post()) && $translation->load(Yii::$app->request->post()))
+    		{
+    			$model->id = $id;
+    			$model->version = $max_version;
+    			$model->thumb_file = UploadedFile::getInstance($model, 'thumb_file');
 
-        if ($model->load(Yii::$app->request->post()))
-        {
+    			if($model->thumb_file == null || empty($model->thumb_file))
+    				$model->thumb = $blog_previous_version->thumb;
+
+          if($model->archive_time == $blog_previous_version->archive_time)
+    			{
+    				$model->archive_time = $blog_previous_version->archive_time;
+    			}
+          else
+    			 {
             $datetime = $model->archive_time;
-            $time = $model->archive_time_time;
-            $year = (int)(substr($datetime, 0, 4));
-            $month = (int)(substr($datetime, 5, 2));
-            $day = (int)(substr($datetime, 8, 2));
-            $hour = (int)(substr($time, 0, 2));
-            $minute = (int)(substr($time, 3, 2));
-            $second = (int)(substr($time, 6, 2));
-            if(substr($time, 9, 2) == 'PM')
-                $hour += 12;
-            $date = new \DateTime();
-            $date->setTimestamp(Jdf::jmktime($hour, $minute, $second, $month, $day, $year));
+      			$time = $model->archive_time_time;
+      			$year = (int)(substr($datetime, 0, 4));
+      			$month = (int)(substr($datetime, 5, 2));
+      			$day = (int)(substr($datetime, 8, 2));
+      			$hour = (int)(substr($time, 0, 2));
+      			$minute = (int)(substr($time, 3, 2));
+      			$second = (int)(substr($time, 6, 2));
+      			if(substr($time, 9, 2) == 'PM')
+      				$hour += 12;
+      			$date = new \DateTime();
+      			$date->setTimestamp(Jdf::jmktime($hour, $minute, $second, $month, $day, $year));
             $model->archive_time = $date->format('Y-m-d H:i:s');
-            $model->author_id = (int) Yii::$app->user->id;
+          }
 
-            $model->thumb_file = UploadedFile::getInstance($model, 'thumb_file');
+    			$translation->blog_id = $model->id;
+    			$translation->language = $this->language;
+    			$translation->version = $max_version_translation;
+    			$translation->title = trim($translation->title);
+    			$translation->subtitle = trim($translation->subtitle);
+    			$translation->intro = trim($translation->intro);
+    			$translation->description = trim($translation->description);
 
-            if($model->save())
-            {
-                if ($translation && $translation->load(Yii::$app->request->post()))
-                {
-                    if(!$translation->title && !$translation->subtitle && !$translation->intro && !$translation->description)
-                        return $this->redirect(['view', 'id' => $model->id]);
-                    $translation->blog_id = $model->id;
-                    $translation->language = $this->language;
-                    if($translation->save())
-                        return $this->redirect(['view', 'id' => $model->id]);
-                }
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-        else
-        {
-            return $this->render('update', [
-                'model' => $model,
-                'translation' => $translation,
-            ]);
-        }
+    			$blog_changed = !($model->attributes == $blog_previous_version->attributes);
+    			$translation_changed = !($translation->attributes == $translation_previous_version->attributes);
+
+    			if(!$blog_changed && !$translation_changed)
+    			{
+    				return $this->redirect(['view', 'id' => $model->id]);
+    			}
+    			else
+    			{
+    				$model->version = $max_version + 1;
+    				if($model->save())
+    				{
+    					$blog_previous_version->updateAttributes (['status' => Blog::$_STATUS_EDITED]) ;
+    					if($translation_changed)
+    					{
+    						if(!$translation->title && !$translation->subtitle && !$translation->intro && !$translation->description)
+    							return $this->redirect(['view', 'id' => $model->id]);
+    						$translation->version = $model->version;
+    						if($translation->save())
+    							return $this->redirect(['view', 'id' => $model->id]);
+    					}
+    					else
+    					{
+    						return $this->redirect(['view', 'id' => $model->id]);
+    					}
+    				}
+    				else {
+    					var_dump($model->errors); die;
+    				}
+    			}
+    		}
+    		else
+    		{
+    			return $this->render('update', [
+    				'model' => $blog_previous_version,
+    				'translation' => $translation_previous_version,
+    			]);
+    		}
     }
 
     /**
@@ -183,12 +227,153 @@ class AdminController extends EGController
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
+     public function actionDelete($id, $redirectUrl)
+     {
+       // $blog_version = BlogTranslation::find()->select('version')->where(['blog_id' => $id])->all();
+   		$blog_version = Blog::find()->select('version')->where(['id' => $id])->all();
+   		foreach($blog_version as $version)
+   		{
+   			foreach($this->findModels($id, $version) as $model)
+   				$model->delete();
+   		}
+       return $this->redirect($redirectUrl);
+     }
 
-        return $this->redirect(['index']);
-    }
+     public function actionConfirm($id, $redirectUrl)
+ 	  {
+ 	    $blog_module = Yii::$app->getModule('blog');
+ 	    $response = [
+ 				'status' => 500,
+ 				'message' => $blog_module::t('blog', 'Server problem')
+ 			];
+ 			try
+ 			{
+ 				$blog = $this->findModelMaxVersion($id);
+ 				if (!$blog)
+ 				{
+ 					$response = [
+ 						'status' => 500,
+ 						'message' => $blog_module::t('blog', 'Blog Not Found.')
+ 					];
+ 				}
+
+ 				if ($blog->confirm())
+ 				{
+ 					$response = [
+ 						'status' => 200,
+ 						'message' => $blog_module::t('blog', 'Successful')
+ 					];
+ 				}
+ 				else
+ 				{
+ 					$response = [
+ 						'status' => 500,
+ 						'message' => $blog_module::t('blog', 'cant set to confirm')
+ 					];
+ 				}
+ 			}
+ 			catch (Exception $exp)
+ 			{
+ 				$response = [
+ 					'status' => 500,
+ 					'message' => $blog_module::t('blog', $exp)
+ 				];
+ 			}
+ 		return $this->redirect($redirectUrl);
+ 	  }
+
+ 		public function actionReject($id, $redirectUrl)
+ 	  {
+ 	    $blog_module = Yii::$app->getModule('blog');
+ 	    $response = [
+ 				'status' => 500,
+ 				'message' => $blog_module::t('blog', 'Server problem')
+ 			];
+ 			try
+ 			{
+ 				$blog = $this->findModelMaxVersion($id);
+ 				if (!$blog)
+ 				{
+ 					$response = [
+ 						'status' => 500,
+ 						'message' => $blog_module::t('blog', 'Blog Not Found.')
+ 					];
+ 				}
+
+ 				if ($blog->reject())
+ 				{
+ 					//var_dump($id); die;
+ 					$response = [
+ 						'status' => 200,
+ 						'message' => $blog_module::t('blog', 'Successful')
+ 					];
+ 				}
+ 				else
+ 				{
+ 					$response = [
+ 						'status' => 500,
+ 						'message' => $blog_module::t('blog', 'cant set to reject')
+ 					];
+ 				}
+ 			}
+ 			catch (Exception $exp)
+ 			{
+ 				$response = [
+ 					'status' => 500,
+ 					'message' => $blog_module::t('blog', $exp)
+ 				];
+ 			}
+
+ 			//return json_encode($response);
+ 			return $this->redirect($redirectUrl);
+ 	  }
+
+ 		public function actionArchive($id, $redirectUrl)
+ 		{
+ 			$blog_module = Yii::$app->getModule('blog');
+ 			$response = [
+ 				'status' => 500,
+ 				'message' => $blog_module::t('blog', 'Server problem')
+ 			];
+ 			try
+ 			{
+ 				$blog = $this->findModelMaxVersion($id);
+ 				if (!$blog)
+ 				{
+ 					$response = [
+ 						'status' => 500,
+ 						'message' => $blog_module::t('blog', 'Blog Not Found.')
+ 					];
+ 				}
+
+ 				if ($blog->archive())
+ 				{
+ 					//var_dump($id); die;
+ 					$response = [
+ 						'status' => 200,
+ 						'message' => $blog_module::t('blog', 'Successful')
+ 					];
+ 				}
+ 				else
+ 				{
+ 					$response = [
+ 						'status' => 500,
+ 						'message' => $blog_module::t('blog', 'cant set to archive')
+ 					];
+ 				}
+ 			}
+ 			catch (Exception $exp)
+ 			{
+ 				$response = [
+ 					'status' => 500,
+ 					'message' => $blog_module::t('blog', $exp)
+ 				];
+ 			}
+
+ 			//return json_encode($response);
+ 			return $this->redirect($redirectUrl);
+ 		}
+
 
     /**
      * Finds the Blog model based on its primary key value.
@@ -205,4 +390,29 @@ class AdminController extends EGController
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+    protected function findModels($id, $version)
+  	{
+  		if (($model = Blog::find()->where(['id' => $id, 'version' => $version])->all()) !== null)
+      {
+      	return $model;
+      }
+      else
+      {
+      	throw new NotFoundHttpException('The requested page does not exist.');
+      }
+  	}
+
+  	protected function findModelMaxVersion($id)
+  	{
+  	  $max_version = Blog::find()->where(['id' => $id])->max('version');
+  	  if (($model = Blog::findOne(['id' => $id, 'version' => $max_version])) !== null)
+  	  {
+  			return $model;
+  	  }
+  	  else
+  	  {
+  		  throw new NotFoundHttpException('The requested page does not exist.');
+  	  }
+  	}
 }

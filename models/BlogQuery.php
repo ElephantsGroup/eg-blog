@@ -1,7 +1,6 @@
 <?php
 
 namespace elephantsGroup\blog\models;
-
 /**
  * This is the ActiveQuery class for [[Blog]].
  *
@@ -41,4 +40,10 @@ class BlogQuery extends \yii\db\ActiveQuery
     {
         return $this->andWhere(['status' => Blog::$_STATUS_CONFIRMED]);
     }
+
+    public function notEdited()
+    {
+        return $this->andWhere(['!=', 'status', Blog::$_STATUS_EDITED]);
+    }
+
 }

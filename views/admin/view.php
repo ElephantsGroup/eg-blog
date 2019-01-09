@@ -6,6 +6,7 @@ use elephantsGroup\blog\models\Blog;
 use elephantsGroup\blog\models\BlogCategory;
 use elephantsGroup\jdf\Jdf;
 use elephantsGroup\user\models\User;
+use Yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model elephantsGroup\blog\models\Blog */
@@ -25,7 +26,7 @@ $base = Yii::$app->getModule('base');
 
     <p>
         <?= Html::a($base::t('Update'), ['update', 'id' => $model->id, 'lang'=>Yii::$app->controller->language], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a($base::t('Delete'), ['delete', 'id' => $model->id, 'lang'=>Yii::$app->controller->language], [
+        <?= Html::a($base::t('Delete'), ['delete', 'id' => $model->id, 'redirectUrl' => Url::to([ '/blog/admin']), 'lang'=>Yii::$app->controller->language], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),

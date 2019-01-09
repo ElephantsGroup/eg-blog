@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use elephantsGroup\blog\models\Blog;
+use elephantsGroup\blog\models\BlogQuery;
 
 /**
  * BlogSearch represents the model behind the search form about `elephantsGroup\blog\models\Blog`.
@@ -43,7 +44,7 @@ class BlogSearch extends Blog
     {
         $module = \Yii::$app->getModule('base');
 
-        $query = Blog::find();
+        $query = Blog::find()->notEdited();
 
         // add conditions that should always apply here
 
@@ -54,6 +55,7 @@ class BlogSearch extends Blog
         $dataProvider->setSort([
             'attributes' => [
                 'id',
+                'version',
                 'category_id',
                 'views',
                 'author_id',

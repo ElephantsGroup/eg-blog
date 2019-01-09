@@ -18,7 +18,7 @@ class BlogTranslationSearch extends BlogTranslation
     public function rules()
     {
         return [
-            [['blog_id'], 'integer'],
+            [['blog_id', 'version'], 'integer'],
             [['language', 'title', 'subtitle', 'intro', 'description'], 'safe'],
         ];
     }
@@ -60,6 +60,7 @@ class BlogTranslationSearch extends BlogTranslation
         // grid filtering conditions
         $query->andFilterWhere([
             'blog_id' => $this->blog_id,
+            'version' => $this->version,
         ]);
 
         $query->andFilterWhere(['like', 'language', $this->language])

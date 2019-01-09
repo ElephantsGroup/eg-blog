@@ -37,7 +37,8 @@ class ArchivedBlog extends Widget
 		foreach($blog as $blog_item)
 		{
 			if($i == $this->number) break;
-			$translation = BlogTranslation::findOne(array('blog_id'=>$blog_item->id, 'language'=>$this->language));
+			$max_version_translation = BlogTranslation::find()->where(['blog_id' => $blog_item->id, 'language' => $this->language])->max('version');
+			$translation = BlogTranslation::findOne(array('news_id'=>$blog_item->id, 'language'=>$this->language, 'version' => $max_date_month));
 			if($translation)
 			{
 				$this->_blog[] = [

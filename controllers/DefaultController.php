@@ -30,8 +30,8 @@ class DefaultController extends EGController
 				//$date->setTimestamp();
 				$date->setTimezone(new \DateTimezone('Iran'));
 				$from = $date->format('Y-m-d');
-			}	
-			
+			}
+
 		}else
 		{
 			if($lang == 'fa-IR')
@@ -52,12 +52,12 @@ class DefaultController extends EGController
 				$from = $date->format('Y-m-d');
 			}
 		}
-		
+
 		return $from;
 	}
-	
+
 	private function getEndDate($lang, $end_time = null)
-	{		
+	{
 		if( $end_time == null)
 		{
 			if($lang == 'fa-IR')
@@ -95,7 +95,7 @@ class DefaultController extends EGController
 				$date->setTimestamp($end_date);
 				$to = $date->format('Y-m-d');
 			}
-			
+
 		}
 		return $to;
 	}
@@ -103,19 +103,20 @@ class DefaultController extends EGController
     public function actionIndex($lang = 'fa-IR', $begin_time = null, $end_time = null)
     {
 		Stat::setView('blog', 'default', 'index');
-		
+
 		//$this->layout = '//creative-item';
 		Yii::$app->controller->addLanguageUrl('fa-IR', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'fa-IR']), (Yii::$app->controller->language !== 'fa-IR'));
 		Yii::$app->controller->addLanguageUrl('en', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'en']), (Yii::$app->controller->language !== 'en'));
-        
+
 		$begin = $this->getBeginDate($this->language, $begin_time);
-		$end = $this->getEndDate($this->language, $end_time); 
+		$end = $this->getEndDate($this->language, $end_time);
 		$blog_list = [];
 //		$blog = Blog::find()->where(['between', 'creation_time', $begin, $end])->all();
-		$blog = Blog::find()->all();
+		$blog = Blog::find()->notEdited()->all();
 		foreach($blog as $blog_item)
 		{
-			$translation = BlogTranslation::findOne(array('blog_id' => $blog_item->id, 'language' => $this->language));
+			$max_version_translation = BLogTranslation::find()->where(['blog_id' => $blog_item->id, 'language' => $this->language])->max('version');
+			$translation = BlogTranslation::findOne(array('blog_id' => $blog_item->id, 'language' => $this->language, 'version' => $max_version_translation));
 			if($translation)
 			{
 				$blog_list[] = [
@@ -144,7 +145,10 @@ class DefaultController extends EGController
         //$this->layout = '//creative-item';
 		Yii::$app->controller->addLanguageUrl('fa-IR', Yii::$app->urlManager->createUrl(['blog/default/view', 'id'=>$id, 'lang' => 'fa-IR']), (Yii::$app->controller->language !== 'fa-IR'));
 		Yii::$app->controller->addLanguageUrl('en', Yii::$app->urlManager->createUrl(['blog/default/view', 'id'=>$id, 'lang' => 'en']), (Yii::$app->controller->language !== 'en'));
-		$model = Blog::findOne($id);
+		//$model = Blog::findOne($id);
+		$max_version = BLog::find()->where(['id' => $id])->max('version');
+		$model = Blog::findOne(['id' => $id, 'version' => $max_version]);
+
 		if(!$model)
 			throw new NotFoundHttpException('The requested page does not exist.');
 		$model->views++;

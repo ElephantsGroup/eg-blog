@@ -34,8 +34,8 @@ class CatController extends EGController
 				//$date->setTimestamp();
 				$date->setTimezone(new \DateTimezone('Iran'));
 				$from = $date->format('Y-m-d');
-			}	
-			
+			}
+
 		}else
 		{
 			if($lang == 'fa-IR')
@@ -56,12 +56,12 @@ class CatController extends EGController
 				$from = $date->format('Y-m-d');
 			}
 		}
-		
+
 		return $from;
 	}
-	
+
 	private function getEndDate($lang, $end_time = null)
-	{		
+	{
 		if( $end_time == null)
 		{
 			if($lang == 'fa-IR')
@@ -99,7 +99,7 @@ class CatController extends EGController
 				$date->setTimestamp($end_date);
 				$to = $date->format('Y-m-d');
 			}
-			
+
 		}
 		return $to;
 	}
@@ -107,13 +107,13 @@ class CatController extends EGController
     public function actionIndex($lang = 'fa-IR', $begin_time = null, $end_time = null)
     {
 		Stat::setView('blog', 'default', 'index');
-		
+
 		//$this->layout = '//creative-item';
 		Yii::$app->controller->addLanguageUrl('fa-IR', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'fa-IR']), (Yii::$app->controller->language !== 'fa-IR'));
 		Yii::$app->controller->addLanguageUrl('en', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'en']), (Yii::$app->controller->language !== 'en'));
-        
+
 		$begin = $this->getBeginDate($this->language, $begin_time);
-		$end = $this->getEndDate($this->language, $end_time); 
+		$end = $this->getEndDate($this->language, $end_time);
 		$cat_list = [];
 //		$blog = Blog::find()->where(['between', 'creation_time', $begin, $end])->all();
 		$cat = BlogCategory::find()->all();
@@ -148,10 +148,11 @@ class CatController extends EGController
 
         $model = BlogCategory::findOne($id);
         $blog_list = [];
-        $cat_blog = Blog::find()->where(['category_id' => $id])->all();
+        $cat_blog = Blog::find()->where(['category_id' => $id])->notEdited()->all();
         foreach($cat_blog as $item)
         {
-            $translation = BlogTranslation::findOne(array('blog_id' => $item->id, 'language' => $this->language));
+					$max_version_translation = BlogTranslation::find()->where(['blog_id' => $item->id, 'language' => $this->language])->max('version');
+					$translation = BlogTranslation::findOne(array('blog_id' => $item->id, 'language' => $this->language, 'version' => $max_version_translation));
             if($translation)
             {
                 $blog_list[] = [
