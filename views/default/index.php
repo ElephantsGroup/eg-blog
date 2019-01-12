@@ -4,6 +4,8 @@ use elephantsGroup\blog\components\LastBlog;
 use elephantsGroup\blog\components\DateList;
 use elephantsGroup\blog\models\Blog;
 $module = \Yii::$app->getModule('blog');
+$module_relation = \Yii::$app->getModule('service-relation');
+$service_id = array_keys($module_relation->services, 'Blog')[0];
 ?>
 <header>
 	<div class="header-content">
@@ -28,7 +30,7 @@ $module = \Yii::$app->getModule('blog');
 					<figure><img src=" <?= $blog_item['thumb'] ?> " alt=" <?= $blog_item['title'] ?>"></figure>
 					<h4><?= $blog_item['subtitle'] ?></h4>
 					<?php
-						if($module->enabled_like) echo \elephantsGroup\like\components\Likes::widget(['item' => $blog_item['id'], 'service' => 1]);
+						if($module->enabled_like) echo \elephantsGroup\like\components\Likes::widget(['item' => $blog_item['id'], 'service' => $service_id]);
 					?>
 					<h3>
 					<a href="<?= Url::to(['/blog/default/view', 'id'=>$blog_item['id'], 'lang'=>$language]) ?>"><?= $blog_item['title'] ?></a>
@@ -36,7 +38,7 @@ $module = \Yii::$app->getModule('blog');
 					<div class="text-small"><?= $blog_item['intro'] ?></div>
 					<div class="col-md-4" style="float: right; padding: 20px;" >
 					<?php
-						if ($module->enabled_rating) echo \elephantsGroup\starRating\components\Rate::widget(['item' => $blog_item['id'], 'service' => 1]);
+						if ($module->enabled_rating) echo \elephantsGroup\starRating\components\Rate::widget(['item' => $blog_item['id'], 'service' => $service_id]);
 					?>
 					</div>
 				</div>
@@ -45,4 +47,3 @@ $module = \Yii::$app->getModule('blog');
 		</div><!-- /.container -->
 	</section>
 </div>
-
