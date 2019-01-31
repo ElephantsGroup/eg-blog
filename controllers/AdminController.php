@@ -74,6 +74,8 @@ class AdminController extends EGController
 
         if ($model->load(Yii::$app->request->post()))
         {
+          if ($model->archive_time != null && !empty($model->archive_time))
+          {
             $datetime = $model->archive_time;
             $time = $model->archive_time_time;
             $year = (int)(substr($datetime, 0, 4));
@@ -86,19 +88,25 @@ class AdminController extends EGController
                 $hour += 12;
             $date = new \DateTime();
             $date->setTimestamp(Jdf::jmktime($hour, $minute, $second, $month, $day, $year));
+            $model->archive_time = $date->format('Y-m-d H:i:s');
+          }
 
-            $datetime_publish = $model->publish_time;
-            $time_publish = $model->publish_time_time;
-            $year_publish = (int)(substr($datetime_publish, 0, 4));
-            $month_publish = (int)(substr($datetime_publish, 5, 2));
-            $day_publish = (int)(substr($datetime_publish, 8, 2));
-            $hour_publish = (int)(substr($time_publish, 0, 2));
-            $minute_publish = (int)(substr($time_publish, 3, 2));
-            $second_publish = (int)(substr($time_publish, 6, 2));
-            if(substr($time_publish, 9, 2) == 'PM')
-                $hour_publish += 12;
-            $date_publish = new \DateTime();
-            $date_publish->setTimestamp(Jdf::jmktime($hour_publish, $minute_publish, $second_publish, $month_publish, $day_publish, $year_publish));
+          if ($model->publish_time != null && !empty($model->publish_time))
+          {
+              $datetime_publish = $model->publish_time;
+              $time_publish = $model->publish_time_time;
+              $year_publish = (int)(substr($datetime_publish, 0, 4));
+              $month_publish = (int)(substr($datetime_publish, 5, 2));
+              $day_publish = (int)(substr($datetime_publish, 8, 2));
+              $hour_publish = (int)(substr($time_publish, 0, 2));
+              $minute_publish = (int)(substr($time_publish, 3, 2));
+              $second_publish = (int)(substr($time_publish, 6, 2));
+              if(substr($time_publish, 9, 2) == 'PM')
+                  $hour_publish += 12;
+              $date_publish = new \DateTime();
+              $date_publish->setTimestamp(Jdf::jmktime($hour_publish, $minute_publish, $second_publish, $month_publish, $day_publish, $year_publish));
+        			$model->publish_time = $date_publish->format('Y-m-d H:i:s');
+          }
 
             $max_ID = Blog::find()->max('id');
             if($max_ID == null && empty($max_ID))
@@ -106,8 +114,6 @@ class AdminController extends EGController
             else
               $model->id = $max_ID+1;
       			$model->version = 1;
-      			$model->archive_time = $date->format('Y-m-d H:i:s');
-      			$model->publish_time = $date_publish->format('Y-m-d H:i:s');
       			$model->author_id = (int) Yii::$app->user->id;
       			$model->thumb_file = UploadedFile::getInstance($model, 'thumb_file');
 
@@ -170,7 +176,7 @@ class AdminController extends EGController
     			{
     				$model->archive_time = $blog_previous_version->archive_time;
     			}
-          else
+          elseif($model->archive_time != null && !empty($model->archive_time))
     			 {
             $datetime = $model->archive_time;
       			$time = $model->archive_time_time;
@@ -191,7 +197,7 @@ class AdminController extends EGController
     			{
     				$model->publish_time = $blog_previous_version->publish_time;
     			}
-          else
+          elseif($model->publish_time != null && !empty($model->publish_time))
     			 {
             $datetime = $model->publish_time;
       			$time = $model->publish_time_time;
