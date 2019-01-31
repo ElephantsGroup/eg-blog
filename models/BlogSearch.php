@@ -20,7 +20,7 @@ class BlogSearch extends Blog
     {
         return [
             [['id', 'category_id', 'views', 'author_id', 'status'], 'integer'],
-            [['update_time', 'creation_time', 'archive_time', 'thumb'], 'safe'],
+            [['update_time', 'creation_time', 'archive_time', 'Publish_time', 'thumb'], 'safe'],
         ];
     }
 

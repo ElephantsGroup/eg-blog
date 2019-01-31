@@ -108,11 +108,15 @@ class DefaultController extends EGController
 		Yii::$app->controller->addLanguageUrl('fa-IR', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'fa-IR']), (Yii::$app->controller->language !== 'fa-IR'));
 		Yii::$app->controller->addLanguageUrl('en', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'en']), (Yii::$app->controller->language !== 'en'));
 
+		$date = new \DateTime('now');
+		$date->setTimezone(new \DateTimezone('Iran'));
+		$now = $date->format('Y-m-d H:m:s');
+
 		$begin = $this->getBeginDate($this->language, $begin_time);
 		$end = $this->getEndDate($this->language, $end_time);
 		$blog_list = [];
 //		$blog = Blog::find()->where(['between', 'creation_time', $begin, $end])->all();
-		$blog = Blog::find()->notEdited()->all();
+		$blog = Blog::find()->where(['<=', 'publish_time' , $now ])->notEdited()->all();
 		foreach($blog as $blog_item)
 		{
 			$max_version_translation = BLogTranslation::find()->where(['blog_id' => $blog_item->id, 'language' => $this->language])->max('version');

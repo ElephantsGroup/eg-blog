@@ -35,12 +35,16 @@ use kartik\time\TimePicker;
     <?= $form->field($model, 'thumb_file')->label('')->fileInput() ?>
 
     <?= $form->field($model, 'creation_time')->widget(jDate\DatePicker::className()) ?>
-	
+
     <?= $form->field($model, 'update_time')->widget(jDate\DatePicker::className()) ?>
-	
+
     <?= $form->field($model, 'archive_time')->widget(jDate\DatePicker::className()) ?>
-	
-	<?= $form->field($model, 'archive_time_time')->label('')->widget(TimePicker::className(), ['value' => $model->archive_time_time, 'pluginOptions' => ['showSeconds' => true]]) ?>
+
+  	<?= $form->field($model, 'archive_time_time')->label('')->widget(TimePicker::className(), ['value' => $model->archive_time_time, 'pluginOptions' => ['showSeconds' => true]]) ?>
+
+    <?= $form->field($model, 'publish_time')->widget(jDate\DatePicker::className()) ?>
+
+    <?= $form->field($model, 'publish_time_time')->label('')->widget(TimePicker::className(), ['pluginOptions' => ['showSeconds' => true]]) ?>
 
     <?= $form->field($model, 'views')->textInput() ?>
 
@@ -63,7 +67,7 @@ use kartik\time\TimePicker;
 			'filebrowserBrowseUrl' => Yii::getAlias('@web') . '/kcfinder/browse.php?type=files',
 			'filebrowserUploadUrl' => Yii::getAlias('@web') . '/kcfinder/upload.php?type=files',
 		],
-	]); 
+	]);
 	?>
 
     <div class="form-group">

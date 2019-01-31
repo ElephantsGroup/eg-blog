@@ -37,7 +37,11 @@ use kartik\time\TimePicker;
 
     <?= $form->field($model, 'archive_time')->widget(jDate\DatePicker::className()) ?>
 
-	<?= $form->field($model, 'archive_time_time')->label('')->widget(TimePicker::className(), ['value' => '12:00 AM', 'pluginOptions' => ['showSeconds' => true]]) ?>
+		<?= $form->field($model, 'archive_time_time')->label('')->widget(TimePicker::className(), ['value' => '12:00 AM', 'pluginOptions' => ['showSeconds' => true]]) ?>
+
+		<?= $form->field($model, 'publish_time')->widget(jDate\DatePicker::className()) ?>
+
+		<?= $form->field($model, 'publish_time_time')->label('')->widget(TimePicker::className(), ['value' => '12:00 AM', 'pluginOptions' => ['showSeconds' => true]]) ?>
 
     <?= $form->field($model, 'thumb_file')->label('')->fileInput() ?>
 

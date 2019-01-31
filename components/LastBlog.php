@@ -43,7 +43,11 @@ class LastBlog extends Widget
 
     public function run()
 	{
-		$blog = Blog::find()->where(['status' => Blog::$_STATUS_CONFIRMED])->orderBy(['creation_time'=>SORT_DESC])->all();
+		$date = new \DateTime('now');
+		$date->setTimezone(new \DateTimezone('Iran'));
+		$now = $date->format('Y-m-d H:m:s');
+		
+		$blog = Blog::find()->where(['<=', 'publish_time' , $now ])->where(['status' => Blog::$_STATUS_CONFIRMED])->orderBy(['creation_time'=>SORT_DESC])->all();
 		$i = 0;
 		foreach($blog as $blog_item)
 		{
