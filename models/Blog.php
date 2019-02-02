@@ -42,7 +42,7 @@ class Blog extends \yii\db\ActiveRecord
 
     public function init()
     {
-        self::$upload_url = str_replace('/backend', '', Yii::getAlias('@web')) . '/uploads/eg-blog/blog';
+        self::$upload_url = str_replace('/backend', '', Yii::getAlias('@web')) . '/../uploads/eg-blog/blog';
         self::$upload_path = str_replace('/backend', '', Yii::getAlias('@webroot')) . '/uploads/eg-blog/blog';
         parent::init();
     }

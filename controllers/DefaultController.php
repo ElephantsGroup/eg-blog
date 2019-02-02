@@ -108,9 +108,10 @@ class DefaultController extends EGController
 		Yii::$app->controller->addLanguageUrl('fa-IR', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'fa-IR']), (Yii::$app->controller->language !== 'fa-IR'));
 		Yii::$app->controller->addLanguageUrl('en', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'en']), (Yii::$app->controller->language !== 'en'));
 
-		$date = new \DateTime('now');
+		$date = new \DateTime();
+		$date->setTimestamp(time());
 		$date->setTimezone(new \DateTimezone('Iran'));
-		$now = $date->format('Y-m-d H:m:s');
+		$now = $date->format('Y-m-d H:i:s');
 
 		$begin = $this->getBeginDate($this->language, $begin_time);
 		$end = $this->getEndDate($this->language, $end_time);
