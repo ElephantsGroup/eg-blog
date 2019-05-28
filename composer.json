@@ -23,10 +23,10 @@
         "elephantsgroup/eg-star-rating": "~1",
         "elephantsgroup/eg-comment": "~1",
         "elephantsGroup/eg-jdf": "~1",
-		"elephantsGroup/eg-jdate": "~1",
-		"kartik-v/yii2-widget-timepicker": "*",
+	"elephantsGroup/eg-jdate": "~1",
+	"kartik-v/yii2-widget-timepicker": "*",
         "2amigos/yii2-ckeditor-widget": "^1.0@dev",
-        "elephantsGroup/eg-kcfinder": "dev-master",
+        "elephantsGroup/eg-kcfinder": "dev-master"
     },
     "config": {
         "process-timeout": 1500,
