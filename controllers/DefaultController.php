@@ -4,6 +4,7 @@ namespace elephantsGroup\blog\controllers;
 
 use Yii;
 //use yii\web\Controller;
+use yii\data\Pagination;
 use elephantsGroup\blog\models\Blog;
 use elephantsGroup\blog\models\BlogTranslation;
 use elephantsGroup\stat\models\Stat;
@@ -103,7 +104,7 @@ class DefaultController extends EGController
     public function actionIndex($lang = 'fa-IR', $begin_time = null, $end_time = null)
     {
 		Stat::setView('blog', 'default', 'index');
-
+		$module = \Yii::$app->getModule('blog');
 		//$this->layout = '//creative-item';
 		Yii::$app->controller->addLanguageUrl('fa-IR', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'fa-IR']), (Yii::$app->controller->language !== 'fa-IR'));
 		Yii::$app->controller->addLanguageUrl('en', Yii::$app->urlManager->createUrl(['blog', 'lang' => 'en']), (Yii::$app->controller->language !== 'en'));
@@ -116,9 +117,17 @@ class DefaultController extends EGController
 		$begin = $this->getBeginDate($this->language, $begin_time);
 		$end = $this->getEndDate($this->language, $end_time);
 		$blog_list = [];
-//		$blog = Blog::find()->where(['between', 'creation_time', $begin, $end])->all();
-		$blog = Blog::find()->where(['<=', 'publish_time' , $now ])->notEdited()->all();
-		foreach($blog as $blog_item)
+		//$blog = Blog::find()->where(['between', 'creation_time', $begin, $end])->all();
+		$blog = Blog::find()->where(['<=', 'publish_time' , $now ])->notEdited();
+		$countQuery = clone $blog;
+
+		$pages = new Pagination(['totalCount' => $countQuery->count()]);
+		$pages->defaultPageSize = $module->page_size;
+		$models = $blog->offset($pages->offset)
+	        ->limit($pages->limit)
+	        ->all();
+
+		foreach($models as $blog_item)
 		{
 			$max_version_translation = BLogTranslation::find()->where(['blog_id' => $blog_item->id, 'language' => $this->language])->max('version');
 			$translation = BlogTranslation::findOne(array('blog_id' => $blog_item->id, 'language' => $this->language, 'version' => $max_version_translation));
@@ -138,7 +147,8 @@ class DefaultController extends EGController
 			'blog' => $blog_list,
 			'from' => $begin,
 			'to' => $end,
-			'language' => $this->language
+			'language' => $this->language,
+			'pages' => $pages
 		]);
 
     }
