@@ -49,7 +49,7 @@ $base = Yii::$app->getModule('base');
             ],
             [
                 'attribute' => 'thumb',
-                'value' => Blog::$upload_url . $model->id . '/' . $model->thumb,
+                'value' => Blog::$upload_url . $model->id . '/' . $model->thumb_size['medium']['name'],
                 'format' => ['image'],
             ],
             [

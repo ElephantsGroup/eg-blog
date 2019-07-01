@@ -4,6 +4,7 @@ namespace elephantsGroup\blog\models;
 
 use Yii;
 use yii\db\ActiveQuery;
+use Grafika\Grafika;
 
 /**
  * This is the model class for table "{{%eg_blog}}".
@@ -39,11 +40,98 @@ class Blog extends \yii\db\ActiveRecord
     public static $upload_url;
     public static $upload_path;
 
+    public $thumb_size = [];
 
     public function init()
     {
+        $module = \Yii::$app->getModule('blog');
         self::$upload_url = str_replace('/admin', '', Yii::getAlias('@web')) . '/uploads/eg-blog/blog';
         self::$upload_path = str_replace('/admin', '', Yii::getAlias('@webroot')) . '/uploads/eg-blog/blog';
+        if(!isset($module->thumbSize))
+        {
+            $this->thumb_size = [
+                'icon' => [
+                    'name' => $module->thumbIconName,
+                    'width' => $module->thumbIconWidth,
+                    'height' => $module->thumbIconHeight
+                ],
+                'larg' => [
+                    'name' => $module->thumbLargName,
+                    'width' => $module->thumbLargWidth,
+                    'height' => $module->thumbLargHeight
+                ],
+                'medium' => [
+                    'name' => $module->thumbMediumName,
+                    'width' => $module->thumbMediumWidth,
+                    'height' => $module->thumbMediumHeight
+                ],
+            ];
+        }
+        else
+        {
+            $this->thumb_size = $module->thumbSize;
+
+            if(!isset($this->thumb_size['icon']))
+            {
+                $this->thumb_size['icon'] = [
+                    'name' => $module->thumbIconName,
+                    'width' => $module->thumbIconWidth,
+                    'height' => $module->thumbIconHeight
+                ];
+            }
+            else
+            {
+                if(!isset($this->thumb_size['icon']['name']))
+                    $this->thumb_size['icon']['name'] = $module->thumbIconName;
+
+                if(!isset($this->thumb_size['icon']['width']))
+                    $this->thumb_size['icon']['width'] = $module->thumbIconWidth;
+
+                if(!isset($this->thumb_size['icon']['height']))
+                    $this->thumb_size['icon']['height'] = $module->thumbIconHeight;
+            }
+
+            if(!isset($this->thumb_size['larg']))
+            {
+                $this->thumb_size['larg'] = [
+                    'name' => $module->thumbLargName,
+                    'width' => $module->thumbLargWidth,
+                    'height' => $module->thumbLargHeight
+                ];
+            }
+            else
+            {
+                if(!isset($this->thumb_size['larg']['name']))
+                    $this->thumb_size['larg']['name'] = $module->thumbLargName;
+
+                if(!isset($this->thumb_size['larg']['width']))
+                    $this->thumb_size['larg']['width'] = $module->thumbLargWidth;
+
+                if(!isset($this->thumb_size['larg']['height']))
+                    $this->thumb_size['larg']['height'] = $module->thumbLargHeight;
+            }
+
+            if(!isset($this->thumb_size['medium']))
+            {
+                $this->thumb_size['medium'] = [
+                    'name' => $module->thumbMediumName,
+                    'width' => $module->thumbMediumWidth,
+                    'height' => $module->thumbMediumHeight
+                ];
+            }
+            else
+            {
+                if(!isset($this->thumb_size['medium']['name']))
+                    $this->thumb_size['medium']['name'] = $module->thumbMediumName;
+
+                if(!isset($this->thumb_size['medium']['width']))
+                    $this->thumb_size['medium']['width'] = $module->thumbMediumWidth;
+
+                if(!isset($this->thumb_size['medium']['height']))
+                    $this->thumb_size['medium']['height'] = $module->thumbMediumHeight;
+            }
+        }
+
         parent::init();
     }
 
@@ -178,6 +266,30 @@ class Blog extends \yii\db\ActiveRecord
             $file_name = 'blog-' . $this->id . '.' . $this->thumb_file->extension;
             $this->thumb_file->saveAs($dir . $file_name);
             $this->updateAttributes(['thumb' => $file_name]);
+
+            $editor = Grafika::createEditor();
+            $editor->open( $image, self::$upload_path . $this->id . '/' . $this->thumb);
+            $backup = clone $image;
+            $image_center = clone $image;
+
+            $width = $image->getWidth();
+            $height = $image->getHeight();
+
+            $size = $width > $height ? $height : $width;
+
+            $editor->crop( $image_center, $size, $size, 'center' );
+            $editor->save( $image_center, self::$upload_path . $this->id . '/cropped-center.jpg' ); // Cropped version
+            $image = [];
+
+            foreach ($this->thumb_size as $key => $value)
+            {
+                $image[$key] = clone $image_center;
+                $editor->resizeExact( $image[$key], $value['width'], $value['height'] );
+                $editor->save( $image[$key], self::$upload_path . $this->id . '/' . $value['name']);
+
+            }
+
+            $editor->save( $backup, self::$upload_path . $this->id . '/original.jpg' ); // Unaffected by crop version
         }
         return parent::afterSave($insert, $changedAttributes);
     }
@@ -192,6 +304,21 @@ class Blog extends \yii\db\ActiveRecord
             $file_path = self::$upload_path . $this->id . '/' . $this->thumb;
             if(file_exists($file_path))
                 unlink($file_path);
+
+            $file_path_center = self::$upload_path . $this->id . '/cropped-center.jpg';
+            if(file_exists($file_path_center))
+                unlink($file_path_center);
+
+            $file_path_original = self::$upload_path . $this->id . '/original.jpg';
+            if(file_exists($file_path_original))
+            unlink($file_path_original);
+
+            foreach ($this->thumb_size as $key => $value)
+            {
+                $thumb_path = self::$upload_path . $this->id . '/'. $value['name'];
+                if(file_exists($thumb_path))
+                    unlink($thumb_path);
+            }
         }
         return parent::beforeDelete();
     }

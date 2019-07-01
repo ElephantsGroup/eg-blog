@@ -135,7 +135,7 @@ class DefaultController extends EGController
 			{
 				$blog_list[] = [
 				    'id' => $blog_item['id'],
-                    'thumb' => Blog::$upload_url . '/' . $blog_item['id'] . '/' . $blog_item['thumb'],
+                    'thumb' => Blog::$upload_url . $blog_item['id'] . '/' . $blog_item->thumb_size['icon']['name'],
                     'title' => $translation->title,
                     'subtitle' => $translation->subtitle,
                     'intro' => $translation->intro

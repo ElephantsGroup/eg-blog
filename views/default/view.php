@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					<div class="post-content">
 						<div class="post-media">
 							<figure>
-								<img src=" <?= Blog::$upload_url . '/' . $model->id . '/' . $model->thumb ?>" alt="">
+								<img src=" <?= Blog::$upload_url . $model->id . '/' . $model->thumb_size['larg']['name'] ?>" alt="">
 							</figure>
 						</div>
 
