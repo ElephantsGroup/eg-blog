@@ -129,6 +129,9 @@ class CatController extends EGController
                 ];
 			}
 		}
+
+		$this->title = Yii::t('config', 'Company Name') . ' - ' . Yii::t('app', 'Blog Category List');
+
 		return $this->render('index',[
 			'category' => $cat_list,
 			'from' => $begin,
@@ -164,6 +167,9 @@ class CatController extends EGController
                 ];
             }
         }
+
+		$this->title = Yii::t('config', 'Company Name') . ' - ' . Yii::t('app', 'Blog Category') . ' - ' . $model->translationByLang->title;
+		
         return $this->render('view', [
             'model' => $model,
             'blog_list' => $blog_list,
